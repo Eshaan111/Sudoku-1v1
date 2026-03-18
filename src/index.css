@@ -1,111 +1,257 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  --bg-color: #ffffff;
+  --text-main: #222222;
+  --border-thick: #222222;
+  --border-thin: #e0e0e0;
+  --pill-gray: #f5f5f5;
+  --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --accent-select: #f0f0f0;
+  --font-family: 'Hiragino Kaku Gothic Pro', 'Inter', sans-serif;
 }
 
 body {
   margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  padding: 0;
+  background-color: #fcfcfc; /* Very light gray to make the white board pop */
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.sudoku-header {
+  width: 100vw;               /* Force it to span the entire viewport width */
+  background-color: #ffffff;
+  border-bottom: 2px solid #222222;
+  display: flex;
+  justify-content: center;    /* Centers the content wrapper inside the bar */
+  padding: 10px 0;
+  box-sizing: border-box;
+  position: sticky;           /* Keeps it at the top when scrolling */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* Inner wrapper to keep text from touching screen edges on ultra-wide monitors */
+.header-content-wrapper {
+  width: 90%;                /* Flexible width for smaller screens */
+  max-width: 1200px;         /* Prevents title and score from drifting too far on ultrawide */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Re-using your specific art details */
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.header-badge {
+  background-color: #222;
+  color: #fff;
+  padding: 5px 12px;
+  font-weight: 900;
+  border-radius: 4px;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+  color: #222;
+}
+
+.header-stats {
+  border: 1.5px solid #e0e0e0;
+  padding: 4px 15px;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222222;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666666;
+}
+
+/* The Main Board Container */
+.sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  border: 3px solid var(--border-thick);
+  background: white;
+  box-shadow: var(--shadow-soft);
+  padding: 2px; /* Slight gap for the outer border */
+}
+
+/* The 3x3 Triad-Box */
+.triad-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  border: 1.5px solid var(--border-thick);
+}
+
+/* Individual Cell Styling */
+.cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: #555; /* User entered numbers are lighter */
+  border: 0.5px solid var(--border-thin);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Initial Puzzle Numbers (Gothic Bold) */
+.cell.initial {
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Interactive States */
+.cell:hover {
+  background-color: var(--pill-gray);
+}
+
+.cell.selected {
+  background-color: var(--accent-select);
+  outline: 2px solid var(--text-main);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* Container for one player */
+.game-panel {
+  display: flex;          /* This is the magic line that puts them side-by-side */
+  flex-direction: row;    /* Explicitly set to row */
+  justify-content: center; /* Centers both players in the middle of the screen */
+  align-items: flex-start; /* Keeps them aligned at the top */
+  gap: 40px;              /* Adds a nice 40px gap between Player 1 and Player 2 */
+  padding: 40px 20px;
+  width: 100%;
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* Ensure the player containers don't try to be too wide */
+.player-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eeeeee;
+  
+  /* Important: prevent them from growing to fill the whole screen */
+  width: fit-content; 
+  min-width: 320px; 
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+/* Player Name & Score Header */
+.player-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #222;
+  padding-bottom: 8px;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: 900;
   margin: 0;
+  letter-spacing: 1px;
+  color: #222;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+.player-score {
+  background: #f5f5f5;
+  padding: 4px 12px;
   border-radius: 4px;
-  color: var(--text-h);
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.score-num {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.score-unit {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #666;
+}
+/* Number Pad Styling */
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(5, 45px); /* Fixed size for buttons */
+  justify-content: center;               /* Center the grid within the container */
+  gap: 10px;
+  margin-top: 25px;
+  width: auto;                           /* Let it take only the space it needs */
+}
+
+.num-btn {
+  width: 45px;                           /* Consistent, smaller sizing */
+  height: 45px;
+  background: #ffffff;
+  border: 1.5px solid #222;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 #222;             /* Subtle "tactile" button look */
+}
+
+/* Hover & Active States */
+.num-btn:hover {
+  background: var(--pill-gray);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #222;
+}
+
+.num-btn:active {
+  transform: translateY(1px);           /* Feels like a real button press */
+  box-shadow: 0 0 0 #222;
+}
+
+.num-btn.delete {
+  background: #fff;
+  border-color: #e53e3e;
+  color: #e53e3e;
+  box-shadow: 0 2px 0 #e53e3e;
+}
+
+.num-btn.delete:hover {
+  background: #e53e3e;
+  color: #fff;
+  box-shadow: 0 3px 0 #b91c1c;
 }
